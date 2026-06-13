@@ -14,7 +14,7 @@
     font-weight: 500;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--accent-ink);
     margin: 0 0 10px;
   }
 
@@ -28,7 +28,7 @@
     text-wrap: balance;
 
     .arrow {
-      color: var(--accent);
+      color: var(--accent-ink);
       font-weight: 600;
       margin: 0 0.12em;
     }
@@ -79,6 +79,7 @@
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
+  box-shadow: var(--shadow);
   transition: border-color 0.15s, background 0.15s, color 0.15s;
 
   /* channel-strip tick on the left */
@@ -106,8 +107,8 @@
   }
   &.active {
     border-color: var(--accent);
-    background: linear-gradient(180deg, rgba(240, 162, 60, 0.14), var(--bg-elev));
-    box-shadow: inset 0 0 0 1px rgba(240, 162, 60, 0.25);
+    background: linear-gradient(180deg, rgba(232, 147, 47, 0.12), var(--bg-elev));
+    box-shadow: inset 0 0 0 1px rgba(232, 147, 47, 0.35);
 
     &::before {
       background: var(--accent);
@@ -145,9 +146,8 @@
   position: relative;
   border: 1.5px dashed var(--border);
   border-radius: var(--radius);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent),
-    var(--bg-elev);
+  background: var(--bg-elev);
+  box-shadow: var(--shadow);
   padding: 44px 20px;
   text-align: center;
   transition: border-color 0.15s, background 0.15s;
@@ -234,6 +234,7 @@
   border: 1px solid var(--border);
   background: var(--bg-elev);
   border-radius: var(--radius);
+  box-shadow: var(--shadow);
   padding: 14px 16px 14px 18px;
   overflow: hidden;
 
@@ -287,16 +288,16 @@
   white-space: nowrap;
 
   .job.converting & {
-    color: var(--accent);
-    border-color: rgba(240, 162, 60, 0.4);
+    color: var(--accent-ink);
+    border-color: rgba(232, 147, 47, 0.5);
   }
   .job.done & {
-    color: var(--ok);
-    border-color: rgba(72, 195, 154, 0.4);
+    color: var(--ok-ink);
+    border-color: rgba(42, 161, 119, 0.5);
   }
   .job.error & {
     color: var(--err);
-    border-color: rgba(224, 87, 63, 0.4);
+    border-color: rgba(194, 51, 32, 0.45);
   }
 }
 
@@ -311,7 +312,7 @@
     flex: 1;
     height: 12px;
     border-radius: 3px;
-    background: #120d08;
+    background: var(--meter-bg);
     border: 1px solid var(--border);
     overflow: hidden;
 

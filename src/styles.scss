@@ -4,25 +4,29 @@
 @import '@fontsource/ibm-plex-mono/400.css';
 @import '@fontsource/ibm-plex-mono/500.css';
 
-/* Theme tokens — "analog tape / VU" identity */
+/* Theme tokens — "analog tape / VU", light "studio paper" register */
 :root {
-  --bg: #15110d;
-  --bg-elev: #1f1813;
-  --bg-elev-2: #2a211a;
-  --border: #3a2e23;
-  --text: #f2e9dc;
-  --muted: #a8957f;
-  --accent: #f0a23c; /* tape amber */
-  --accent-strong: #e0892a;
-  --ok: #48c39a; /* VU "level OK" green */
-  --err: #e0573f; /* peak red */
+  --bg: #f1f0ec; /* warm light, flat (no gradient) */
+  --bg-elev: #ffffff; /* cards */
+  --bg-elev-2: #f6f5f1; /* inputs */
+  --border: #e3ddd1; /* warm hairline */
+  --text: #1f1a14; /* near-black warm */
+  --muted: #786e60;
+  --meter-bg: #ebe5d8; /* VU track inset */
+  --accent: #e8932f; /* tape amber — fills, borders, active */
+  --accent-strong: #d07f1d;
+  --accent-ink: #a85f10; /* deep amber — text/icons on light */
+  --ok: #2aa177; /* VU green — fills */
+  --ok-ink: #117a57; /* VU green — text */
+  --err: #c23320; /* peak red (legible as text) */
   --radius: 12px;
+  --shadow: 0 1px 2px rgba(31, 26, 20, 0.05), 0 6px 16px -10px rgba(31, 26, 20, 0.12);
 
   --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
   --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', monospace;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -36,13 +40,11 @@ body {
 }
 
 body {
-  background:
-    radial-gradient(1100px 520px at 50% -8%, #2a1f14 0%, var(--bg) 62%) fixed;
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
 }
 
 /* Form controls inherit the page font instead of the UA default */
@@ -60,7 +62,7 @@ button {
 
 /* Visible keyboard focus for every interactive element */
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 
