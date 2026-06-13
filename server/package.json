@@ -1,0 +1,14 @@
+{
+  "name": "mkv-to-mp3-server",
+  "version": "1.0.0",
+  "description": "Ephemeral MKV->MP3 conversion API (native ffmpeg, deletes uploads immediately).",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "busboy": "^1.6.0",
+    "express": "^4.21.2"
+  }
+}

@@ -1,0 +1,28 @@
+[Unit]
+Description=mkv-to-mp3 conversion API (ephemeral, deletes uploads immediately)
+After=network.target
+
+[Service]
+Type=simple
+# Adjust user and paths to your server.
+User=ubuntu
+WorkingDirectory=/opt/mkv-to-mp3/server
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=3
+
+# Configuration
+Environment=PORT=3000
+Environment=FFMPEG_PATH=ffmpeg
+Environment=MAX_UPLOAD_BYTES=8589934592
+# Use a private tmp dir so uploads never mix with the rest of the system,
+# and are wiped automatically when the service restarts.
+PrivateTmp=true
+
+# Light hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target

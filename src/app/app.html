@@ -1,0 +1,159 @@
+<div class="page">
+  <header class="hero">
+    <h1>MKV → MP3</h1>
+    <p class="tagline">Extrae el audio de tus vídeos. Privado: por defecto la conversión ocurre
+      <strong>en tu navegador</strong> y el archivo no se sube a ningún sitio.</p>
+  </header>
+
+  <!-- Mode selector -->
+  <section class="modes" role="radiogroup" aria-label="Dónde convertir">
+    <button
+      type="button"
+      class="chip"
+      [class.active]="conv.mode() === 'auto'"
+      (click)="setMode('auto')"
+    >
+      Automático
+      <small>navegador, y servidor si es enorme</small>
+    </button>
+    <button
+      type="button"
+      class="chip"
+      [class.active]="conv.mode() === 'client'"
+      (click)="setMode('client')"
+    >
+      Navegador
+      <small>100% privado · sin subir nada</small>
+    </button>
+    <button
+      type="button"
+      class="chip"
+      [class.active]="conv.mode() === 'server'"
+      [disabled]="conv.serverAvailable() === false"
+      (click)="setMode('server')"
+    >
+      Servidor
+      <small>
+        @if (conv.serverAvailable() === null) { comprobando… }
+        @else if (conv.serverAvailable()) { rápido · borra el archivo al instante }
+        @else { no disponible }
+      </small>
+    </button>
+  </section>
+
+  @if (conv.mode() === 'auto') {
+    <label class="threshold">
+      Usar el servidor cuando el archivo supere
+      <input
+        type="number"
+        min="50"
+        step="50"
+        [ngModel]="conv.thresholdMb()"
+        (ngModelChange)="conv.thresholdMb.set(+$event)"
+        [disabled]="conv.serverAvailable() === false"
+      />
+      MB
+      @if (conv.serverAvailable() === false) {
+        <span class="muted">(servidor no disponible: todo irá por el navegador)</span>
+      }
+    </label>
+  }
+
+  <!-- Dropzone -->
+  <section
+    class="dropzone"
+    [class.dragging]="dragging()"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+  >
+    <input
+      #fileInput
+      type="file"
+      multiple
+      accept="video/*,.mkv,.mp4,.mov,.avi,.webm,.flv,.m4v"
+      hidden
+      (change)="onFilePick($event)"
+    />
+    <div class="drop-inner">
+      <p class="drop-title">Arrastra aquí tus vídeos</p>
+      <p class="muted">o</p>
+      <button type="button" class="btn" (click)="fileInput.click()">Elegir archivos</button>
+      @if (conv.engineLoading()) {
+        <p class="muted small">Cargando el motor de conversión…</p>
+      }
+    </div>
+  </section>
+
+  <!-- Job list -->
+  @if (conv.hasJobs()) {
+    <section class="toolbar">
+      <button
+        type="button"
+        class="btn primary"
+        [disabled]="conv.running() || conv.pendingCount() === 0"
+        (click)="conv.convertAll()"
+      >
+        @if (conv.running()) { Convirtiendo… } @else { Convertir todo ({{ conv.pendingCount() }}) }
+      </button>
+      <button
+        type="button"
+        class="btn"
+        [disabled]="conv.doneCount() === 0"
+        (click)="conv.downloadAll()"
+      >
+        Descargar todo ({{ conv.doneCount() }})
+      </button>
+      <button type="button" class="btn ghost" (click)="conv.clearFinished()">Limpiar terminados</button>
+    </section>
+
+    <ul class="jobs">
+      @for (job of jobs(); track trackJob($index, job)) {
+        <li class="job" [class.error]="job.status === 'error'" [class.done]="job.status === 'done'">
+          <div class="job-main">
+            <span class="job-name" [title]="job.name">{{ job.name }}</span>
+            <span class="job-meta">
+              {{ formatBytes(job.sizeBytes) }} · {{ statusLabel(job) }}
+            </span>
+          </div>
+
+          <div class="job-bar">
+            <div class="bar-track">
+              <div
+                class="bar-fill"
+                [class.indeterminate]="job.status === 'converting' && job.progress === 0"
+                [style.width.%]="job.status === 'converting' || job.status === 'done' ? percent(job) : 0"
+              ></div>
+            </div>
+            <span class="bar-pct">
+              @if (job.status === 'converting' || job.status === 'done') { {{ percent(job) }}% }
+            </span>
+          </div>
+
+          @if (job.error) { <p class="job-error">{{ job.error }}</p> }
+
+          <div class="job-actions">
+            @if (job.status === 'done') {
+              <button type="button" class="btn small" (click)="conv.download(job.id)">Descargar MP3</button>
+            }
+            @if (job.status === 'queued' || job.status === 'error' || job.status === 'canceled') {
+              <button type="button" class="btn small ghost" (click)="conv.runJob(job.id)">
+                @if (job.status === 'queued') { Convertir } @else { Reintentar }
+              </button>
+            }
+            @if (job.status === 'converting') {
+              <button type="button" class="btn small ghost" (click)="conv.cancelJob(job.id)">Cancelar</button>
+            }
+            @if (job.status !== 'converting') {
+              <button type="button" class="btn small ghost danger" (click)="conv.removeJob(job.id)">Quitar</button>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+
+  <footer class="foot">
+    <span>Hecho con ffmpeg.wasm + Angular 20</span>
+  </footer>
+</div>

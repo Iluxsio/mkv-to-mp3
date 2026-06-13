@@ -1,0 +1,31 @@
+# --- mkv-to-mp3 reverse proxy snippet for Caddy ---
+# Adapt the domain. Add this as a new site block in your existing Caddyfile.
+#
+# Layout:
+#   - Caddy serves the built Angular app (dist/mkv-to-mp3/browser) as static files.
+#   - /api/* is reverse-proxied to the Node conversion API (systemd service on :3000).
+#
+# The browser (client-side) conversion uses the single-threaded ffmpeg core,
+# so NO Cross-Origin-Isolation (COOP/COEP) headers are required.
+
+mkv.luxhauntedrealm.com {
+	encode zstd gzip
+
+	# Conversion API. Long timeouts: multi-GB uploads + encoding can take minutes.
+	handle_path /api/* {
+		reverse_proxy localhost:3000 {
+			transport http {
+				# Allow long-running uploads/conversions.
+				read_timeout 30m
+				write_timeout 30m
+			}
+		}
+	}
+
+	# Static frontend (built Angular). .wasm is served as application/wasm by Caddy.
+	handle {
+		root * /var/www/mkv-to-mp3
+		try_files {path} /index.html
+		file_server
+	}
+}
