@@ -115,6 +115,10 @@ exercise the server mode.
    `sudo systemctl enable --now mkv2mp3-api`.
 4. **Caddy:** add the block from `deploy/Caddyfile.example` to your Caddyfile.
 
+📦 **Step-by-step guide** for deploying on a server that already runs Caddy
+(e.g. next to a Foundry VTT instance, on its own subdomain, no conflicts):
+[deploy/DEPLOY.md](deploy/DEPLOY.md).
+
 If you only want the fully-private browser mode, you can host **just the static
 build** anywhere — no server required.
 

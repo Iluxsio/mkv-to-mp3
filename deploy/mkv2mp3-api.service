@@ -15,6 +15,9 @@ RestartSec=3
 Environment=PORT=3000
 Environment=FFMPEG_PATH=ffmpeg
 Environment=MAX_UPLOAD_BYTES=8589934592
+# Serve the built frontend from the same Node process (single origin).
+# This is the contents of the Angular build: dist/mkv-to-mp3/browser
+Environment=STATIC_DIR=/opt/mkv-to-mp3/web
 # Use a private tmp dir so uploads never mix with the rest of the system,
 # and are wiped automatically when the service restarts.
 PrivateTmp=true

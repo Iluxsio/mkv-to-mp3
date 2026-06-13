@@ -1,31 +1,43 @@
-# --- mkv-to-mp3 reverse proxy snippet for Caddy ---
-# Adapt the domain. Add this as a new site block in your existing Caddyfile.
+# --- mkv-to-mp3 site block for Caddy ---
+# Add this as a NEW, separate site block in your existing Caddyfile (the one that
+# already serves Foundry). Separate domains => no conflict with Foundry.
 #
-# Layout:
-#   - Caddy serves the built Angular app (dist/mkv-to-mp3/browser) as static files.
-#   - /api/* is reverse-proxied to the Node conversion API (systemd service on :3000).
+# Recommended setup: the Node service serves BOTH the static frontend and the
+# /api, so Caddy just reverse-proxies the whole subdomain to it. The Node app
+# listens on localhost:3000 only, so no extra cloud/OS firewall port is needed
+# (Caddy already owns 80/443).
 #
-# The browser (client-side) conversion uses the single-threaded ffmpeg core,
-# so NO Cross-Origin-Isolation (COOP/COEP) headers are required.
+# Replace mkv.luxhauntedrealm.com with your chosen subdomain.
 
 mkv.luxhauntedrealm.com {
 	encode zstd gzip
 
-	# Conversion API. Long timeouts: multi-GB uploads + encoding can take minutes.
-	handle_path /api/* {
-		reverse_proxy localhost:3000 {
-			transport http {
-				# Allow long-running uploads/conversions.
-				read_timeout 30m
-				write_timeout 30m
-			}
+	reverse_proxy localhost:3000 {
+		# Multi-GB uploads + server-side encoding can take several minutes.
+		transport http {
+			read_timeout 30m
+			write_timeout 30m
 		}
 	}
-
-	# Static frontend (built Angular). .wasm is served as application/wasm by Caddy.
-	handle {
-		root * /var/www/mkv-to-mp3
-		try_files {path} /index.html
-		file_server
-	}
 }
+
+# --- Alternative: let Caddy serve the static files directly ---
+# Use this instead of the block above if you'd rather not route static assets
+# through Node. Then you do NOT need STATIC_DIR in the systemd service.
+#
+# mkv.luxhauntedrealm.com {
+# 	encode zstd gzip
+# 	handle_path /api/* {
+# 		reverse_proxy localhost:3000 {
+# 			transport http {
+# 				read_timeout 30m
+# 				write_timeout 30m
+# 			}
+# 		}
+# 	}
+# 	handle {
+# 		root * /opt/mkv-to-mp3/web
+# 		try_files {path} /index.html
+# 		file_server
+# 	}
+# }
