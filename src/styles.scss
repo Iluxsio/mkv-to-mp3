@@ -1,16 +1,27 @@
-/* Global styles + theme tokens */
+/* Self-hosted fonts (no CDN — keeps the privacy promise) */
+@import '@fontsource/bricolage-grotesque/600.css';
+@import '@fontsource/bricolage-grotesque/800.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+/* Theme tokens — "analog tape / VU" identity */
 :root {
-  --bg: #0f1117;
-  --bg-elev: #181b24;
-  --bg-elev-2: #20242f;
-  --border: #2a2f3a;
-  --text: #e7e9ee;
-  --muted: #9aa3b2;
-  --accent: #6d8bff;
-  --accent-strong: #5570f0;
-  --ok: #3fbf7f;
-  --err: #ff6b6b;
-  --radius: 14px;
+  --bg: #15110d;
+  --bg-elev: #1f1813;
+  --bg-elev-2: #2a211a;
+  --border: #3a2e23;
+  --text: #f2e9dc;
+  --muted: #a8957f;
+  --accent: #f0a23c; /* tape amber */
+  --accent-strong: #e0892a;
+  --ok: #48c39a; /* VU "level OK" green */
+  --err: #e0573f; /* peak red */
+  --radius: 12px;
+
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', monospace;
+
   color-scheme: dark;
 }
 
@@ -26,9 +37,54 @@ body {
 
 body {
   background:
-    radial-gradient(1200px 600px at 50% -10%, #1b2030 0%, var(--bg) 60%) fixed;
+    radial-gradient(1100px 520px at 50% -8%, #2a1f14 0%, var(--bg) 62%) fixed;
   color: var(--text);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Form controls inherit the page font instead of the UA default */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Visible keyboard focus for every interactive element */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Visually hidden, still announced by screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

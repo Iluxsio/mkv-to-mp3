@@ -1,16 +1,18 @@
 <div class="page">
   <header class="hero">
-    <h1>MKV → MP3</h1>
-    <p class="tagline">Extrae el audio de tus vídeos. Privado: por defecto la conversión ocurre
+    <p class="eyebrow">Extractor de audio</p>
+    <h1>MKV <span class="arrow">→</span> MP3</h1>
+    <p class="tagline">Saca el audio de tus vídeos. Privado: por defecto la conversión ocurre
       <strong>en tu navegador</strong> y el archivo no se sube a ningún sitio.</p>
   </header>
 
   <!-- Mode selector -->
-  <section class="modes" role="radiogroup" aria-label="Dónde convertir">
+  <section class="modes" role="group" aria-label="Dónde convertir">
     <button
       type="button"
       class="chip"
       [class.active]="conv.mode() === 'auto'"
+      [attr.aria-pressed]="conv.mode() === 'auto'"
       (click)="setMode('auto')"
     >
       Automático
@@ -20,6 +22,7 @@
       type="button"
       class="chip"
       [class.active]="conv.mode() === 'client'"
+      [attr.aria-pressed]="conv.mode() === 'client'"
       (click)="setMode('client')"
     >
       Navegador
@@ -29,6 +32,7 @@
       type="button"
       class="chip"
       [class.active]="conv.mode() === 'server'"
+      [attr.aria-pressed]="conv.mode() === 'server'"
       [disabled]="conv.serverAvailable() === false"
       (click)="setMode('server')"
     >
@@ -46,6 +50,7 @@
       Usar el servidor cuando el archivo supere
       <input
         type="number"
+        inputmode="numeric"
         min="50"
         step="50"
         [ngModel]="conv.thresholdMb()"
@@ -80,7 +85,7 @@
       <p class="muted">o</p>
       <button type="button" class="btn" (click)="fileInput.click()">Elegir archivos</button>
       @if (conv.engineLoading()) {
-        <p class="muted small">Cargando el motor de conversión…</p>
+        <p class="muted small" aria-live="polite">Cargando el motor de conversión…</p>
       }
     </div>
   </section>
@@ -109,16 +114,26 @@
 
     <ul class="jobs">
       @for (job of jobs(); track trackJob($index, job)) {
-        <li class="job" [class.error]="job.status === 'error'" [class.done]="job.status === 'done'">
-          <div class="job-main">
+        <li
+          class="job"
+          [class.converting]="job.status === 'converting'"
+          [class.error]="job.status === 'error'"
+          [class.done]="job.status === 'done'"
+        >
+          <div class="job-head">
             <span class="job-name" [title]="job.name">{{ job.name }}</span>
-            <span class="job-meta">
-              {{ formatBytes(job.sizeBytes) }} · {{ statusLabel(job) }}
-            </span>
+            <span class="job-status" aria-live="polite">{{ statusLabel(job) }}</span>
           </div>
 
           <div class="job-bar">
-            <div class="bar-track">
+            <div
+              class="bar-track"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-valuenow]="job.status === 'converting' && job.progress === 0 ? null : percent(job)"
+              [attr.aria-label]="'Progreso de ' + job.name"
+            >
               <div
                 class="bar-fill"
                 [class.indeterminate]="job.status === 'converting' && job.progress === 0"
@@ -132,21 +147,24 @@
 
           @if (job.error) { <p class="job-error">{{ job.error }}</p> }
 
-          <div class="job-actions">
-            @if (job.status === 'done') {
-              <button type="button" class="btn small" (click)="conv.download(job.id)">Descargar MP3</button>
-            }
-            @if (job.status === 'queued' || job.status === 'error' || job.status === 'canceled') {
-              <button type="button" class="btn small ghost" (click)="conv.runJob(job.id)">
-                @if (job.status === 'queued') { Convertir } @else { Reintentar }
-              </button>
-            }
-            @if (job.status === 'converting') {
-              <button type="button" class="btn small ghost" (click)="conv.cancelJob(job.id)">Cancelar</button>
-            }
-            @if (job.status !== 'converting') {
-              <button type="button" class="btn small ghost danger" (click)="conv.removeJob(job.id)">Quitar</button>
-            }
+          <div class="job-foot">
+            <span class="job-size">{{ formatBytes(job.sizeBytes) }}</span>
+            <div class="job-actions">
+              @if (job.status === 'done') {
+                <button type="button" class="btn small primary" (click)="conv.download(job.id)">Descargar MP3</button>
+              }
+              @if (job.status === 'queued' || job.status === 'error' || job.status === 'canceled') {
+                <button type="button" class="btn small ghost" (click)="conv.runJob(job.id)">
+                  @if (job.status === 'queued') { Convertir } @else { Reintentar }
+                </button>
+              }
+              @if (job.status === 'converting') {
+                <button type="button" class="btn small ghost" (click)="conv.cancelJob(job.id)">Cancelar</button>
+              }
+              @if (job.status !== 'converting') {
+                <button type="button" class="btn small ghost danger" (click)="conv.removeJob(job.id)">Quitar</button>
+              }
+            </div>
           </div>
         </li>
       }
@@ -154,6 +172,6 @@
   }
 
   <footer class="foot">
-    <span>Hecho con ffmpeg.wasm + Angular 20</span>
+    <span class="spec">MP3 · VBR ~190 kbps</span> · ffmpeg.wasm + Angular
   </footer>
 </div>

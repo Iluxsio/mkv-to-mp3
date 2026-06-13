@@ -48,6 +48,9 @@ export class App implements OnInit {
 
   // ----- presentation helpers -----
 
+  private readonly nf1 = new Intl.NumberFormat('es', { maximumFractionDigits: 1 });
+  private readonly nf0 = new Intl.NumberFormat('es', { maximumFractionDigits: 0 });
+
   formatBytes(bytes: number): string {
     if (bytes < 1024) return `${bytes} B`;
     const units = ['KB', 'MB', 'GB', 'TB'];
@@ -57,7 +60,8 @@ export class App implements OnInit {
       value /= 1024;
       i++;
     }
-    return `${value.toFixed(value >= 100 || i === 0 ? 0 : 1)} ${units[i]}`;
+    const fmt = value >= 100 ? this.nf0 : this.nf1;
+    return `${fmt.format(value)} ${units[i]}`;
   }
 
   statusLabel(job: ConversionJob): string {
